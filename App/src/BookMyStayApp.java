@@ -1,36 +1,43 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.Queue;
 
-class RoomSearchService {
+class Reservation {
 
-    public void searchAvailableRooms(Map<String, Integer> availability) {
+    private String guestName;
+    private String roomType;
 
-        // Single Room
-        if (availability.get("Single") > 0) {
-            System.out.println("Single Room Available: " + availability.get("Single"));
-            System.out.println("Beds: 1");
-            System.out.println("Size: 250 sq ft");
-            System.out.println("Price: ₹1500");
-            System.out.println();
-        }
+    public Reservation(String guestName, String roomType) {
+        this.guestName = guestName;
+        this.roomType = roomType;
+    }
 
-        // Double Room
-        if (availability.get("Double") > 0) {
-            System.out.println("Double Room Available: " + availability.get("Double"));
-            System.out.println("Beds: 2");
-            System.out.println("Size: 400 sq ft");
-            System.out.println("Price: ₹2500");
-            System.out.println();
-        }
+    public String getGuestName() {
+        return guestName;
+    }
 
-        // Suite Room
-        if (availability.get("Suite") > 0) {
-            System.out.println("Suite Room Available: " + availability.get("Suite"));
-            System.out.println("Beds: 3");
-            System.out.println("Size: 750 sq ft");
-            System.out.println("Price: ₹5000");
-            System.out.println();
-        }
+    public String getRoomType() {
+        return roomType;
+    }
+}
+
+class BookingRequestQueue {
+
+    private Queue<Reservation> requestQueue;
+
+    public BookingRequestQueue() {
+        requestQueue = new LinkedList<>();
+    }
+
+    public void addRequest(Reservation reservation) {
+        requestQueue.offer(reservation);
+    }
+
+    public Reservation getNextRequest() {
+        return requestQueue.poll();
+    }
+
+    public boolean hasPendingRequests() {
+        return !requestQueue.isEmpty();
     }
 }
 
@@ -38,13 +45,23 @@ public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        Map<String, Integer> availability = new HashMap<>();
+        System.out.println("Booking Request Queue");
 
-        availability.put("Single", 10);
-        availability.put("Double", 5);
-        availability.put("Suite", 2);
+        BookingRequestQueue bookingQueue = new BookingRequestQueue();
 
-        RoomSearchService searchService = new RoomSearchService();
-        searchService.searchAvailableRooms(availability);
+        Reservation r1 = new Reservation("Abhi", "Single");
+        Reservation r2 = new Reservation("Subha", "Double");
+        Reservation r3 = new Reservation("Vanmathi", "Suite");
+
+        bookingQueue.addRequest(r1);
+        bookingQueue.addRequest(r2);
+        bookingQueue.addRequest(r3);
+
+        // Process queue in FIFO order
+        while (bookingQueue.hasPendingRequests()) {
+            Reservation r = bookingQueue.getNextRequest();
+            System.out.println("Guest: " + r.getGuestName() +
+                    " | Room Type: " + r.getRoomType());
+        }
     }
 }
