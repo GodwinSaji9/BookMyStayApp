@@ -1,70 +1,47 @@
-abstract class Room {
+import java.util.*;
 
-    // Number of beds available in the room
-    protected int numberOfBeds;
+class BookingHistory {
 
-    // Total size of the room in square feet
-    protected int squareFeet;
+    private List<String> confirmedReservations;
 
-    // Price charged per night
-    protected double pricePerNight;
-
-    // Constructor
-    public Room(int numberOfBeds, int squareFeet, double pricePerNight) {
-        this.numberOfBeds = numberOfBeds;
-        this.squareFeet = squareFeet;
-        this.pricePerNight = pricePerNight;
+    public BookingHistory() {
+        confirmedReservations = new ArrayList<>();
     }
 
-    // Method to display room details
-    public void displayRoomDetails() {
-        System.out.println("Number of Beds: " + numberOfBeds);
-        System.out.println("Room Size (sq ft): " + squareFeet);
-        System.out.println("Price Per Night: ₹" + pricePerNight);
-        System.out.println("---------------------------");
+    public void addReservation(String reservation) {
+        confirmedReservations.add(reservation);
+    }
+
+    public List<String> getConfirmedReservations() {
+        return confirmedReservations;
     }
 }
 
-// Single Room
-class SingleRoom extends Room {
+class BookingReportService {
 
-    public SingleRoom() {
-        super(1, 250, 1500.0);
+    public void generateReport(BookingHistory history) {
+
+        List<String> reservations = history.getConfirmedReservations();
+
+        System.out.println("Booking History Report");
+
+        for (String r : reservations) {
+            System.out.println(r);
+        }
     }
 }
 
-// Double Room
-class DoubleRoom extends Room {
-
-    public DoubleRoom() {
-        super(2, 400, 2500.0);
-    }
-}
-
-// Suite Room
-class SuiteRoom extends Room {
-
-    public SuiteRoom() {
-        super(3, 750, 5000.0);
-    }
-}
-
-// Main class
 public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        SingleRoom single = new SingleRoom();
-        DoubleRoom doubleRoom = new DoubleRoom();
-        SuiteRoom suite = new SuiteRoom();
+        BookingHistory history = new BookingHistory();
 
-        System.out.println("Single Room Details:");
-        single.displayRoomDetails();
+        history.addReservation("Abhi - Single");
+        history.addReservation("Subha - Double");
+        history.addReservation("Vanmathi - Suite");
 
-        System.out.println("Double Room Details:");
-        doubleRoom.displayRoomDetails();
-
-        System.out.println("Suite Room Details:");
-        suite.displayRoomDetails();
+        BookingReportService reportService = new BookingReportService();
+        reportService.generateReport(history);
     }
 }
