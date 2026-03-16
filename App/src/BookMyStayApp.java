@@ -1,70 +1,67 @@
-abstract class Room {
+import java.io.*;
+import java.util.*;
 
-    // Number of beds available in the room
-    protected int numberOfBeds;
+class FilePersistenceService {
 
-    // Total size of the room in square feet
-    protected int squareFeet;
+    public void saveInventory(Map<String, Integer> inventory, String filePath) {
 
-    // Price charged per night
-    protected double pricePerNight;
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
 
-    // Constructor
-    public Room(int numberOfBeds, int squareFeet, double pricePerNight) {
-        this.numberOfBeds = numberOfBeds;
-        this.squareFeet = squareFeet;
-        this.pricePerNight = pricePerNight;
+            for (Map.Entry<String, Integer> entry : inventory.entrySet()) {
+                writer.write(entry.getKey() + "=" + entry.getValue());
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error saving inventory.");
+        }
     }
 
-    // Method to display room details
-    public void displayRoomDetails() {
-        System.out.println("Number of Beds: " + numberOfBeds);
-        System.out.println("Room Size (sq ft): " + squareFeet);
-        System.out.println("Price Per Night: ₹" + pricePerNight);
-        System.out.println("---------------------------");
-    }
-}
+    public void loadInventory(Map<String, Integer> inventory, String filePath) {
 
-// Single Room
-class SingleRoom extends Room {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 
-    public SingleRoom() {
-        super(1, 250, 1500.0);
-    }
-}
+            String line;
 
-// Double Room
-class DoubleRoom extends Room {
+            while ((line = reader.readLine()) != null) {
 
-    public DoubleRoom() {
-        super(2, 400, 2500.0);
+                String[] parts = line.split("=");
+                String roomType = parts[0];
+                int count = Integer.parseInt(parts[1]);
+
+                inventory.put(roomType, count);
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error loading inventory.");
+        }
     }
 }
 
-// Suite Room
-class SuiteRoom extends Room {
-
-    public SuiteRoom() {
-        super(3, 750, 5000.0);
-    }
-}
-
-// Main class
 public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        SingleRoom single = new SingleRoom();
-        DoubleRoom doubleRoom = new DoubleRoom();
-        SuiteRoom suite = new SuiteRoom();
+        Map<String, Integer> inventory = new HashMap<>();
 
-        System.out.println("Single Room Details:");
-        single.displayRoomDetails();
+        inventory.put("Single", 5);
+        inventory.put("Double", 3);
+        inventory.put("Suite", 2);
 
-        System.out.println("Double Room Details:");
-        doubleRoom.displayRoomDetails();
+        FilePersistenceService service = new FilePersistenceService();
 
-        System.out.println("Suite Room Details:");
-        suite.displayRoomDetails();
+        String filePath = "inventory.txt";
+
+        service.saveInventory(inventory, filePath);
+
+        inventory.clear();
+
+        service.loadInventory(inventory, filePath);
+
+        System.out.println("Recovered Inventory:");
+
+        for (Map.Entry<String, Integer> entry : inventory.entrySet()) {
+            System.out.println(entry.getKey() + " = " + entry.getValue());
+        }
     }
 }
