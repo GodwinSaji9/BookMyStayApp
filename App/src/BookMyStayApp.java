@@ -1,70 +1,60 @@
-abstract class Room {
+import java.util.*;
 
-    // Number of beds available in the room
-    protected int numberOfBeds;
-
-    // Total size of the room in square feet
-    protected int squareFeet;
-
-    // Price charged per night
-    protected double pricePerNight;
-
-    // Constructor
-    public Room(int numberOfBeds, int squareFeet, double pricePerNight) {
-        this.numberOfBeds = numberOfBeds;
-        this.squareFeet = squareFeet;
-        this.pricePerNight = pricePerNight;
-    }
-
-    // Method to display room details
-    public void displayRoomDetails() {
-        System.out.println("Number of Beds: " + numberOfBeds);
-        System.out.println("Room Size (sq ft): " + squareFeet);
-        System.out.println("Price Per Night: ₹" + pricePerNight);
-        System.out.println("---------------------------");
+class InvalidBookingException extends Exception {
+    public InvalidBookingException(String message) {
+        super(message);
     }
 }
 
-// Single Room
-class SingleRoom extends Room {
+class ReservationValidator {
 
-    public SingleRoom() {
-        super(1, 250, 1500.0);
+    public void validate(String guestName, String roomType) throws InvalidBookingException {
+
+        if (guestName == null || guestName.trim().isEmpty()) {
+            throw new InvalidBookingException("Guest name cannot be empty");
+        }
+
+        if (roomType == null || roomType.trim().isEmpty()) {
+            throw new InvalidBookingException("Room type cannot be empty");
+        }
+
+        if (!roomType.equalsIgnoreCase("Single") &&
+                !roomType.equalsIgnoreCase("Double") &&
+                !roomType.equalsIgnoreCase("Suite")) {
+
+            throw new InvalidBookingException("Invalid room type selected");
+        }
     }
 }
 
-// Double Room
-class DoubleRoom extends Room {
-
-    public DoubleRoom() {
-        super(2, 400, 2500.0);
-    }
-}
-
-// Suite Room
-class SuiteRoom extends Room {
-
-    public SuiteRoom() {
-        super(3, 750, 5000.0);
-    }
-}
-
-// Main class
 public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        SingleRoom single = new SingleRoom();
-        DoubleRoom doubleRoom = new DoubleRoom();
-        SuiteRoom suite = new SuiteRoom();
+        System.out.println("Booking Validation");
 
-        System.out.println("Single Room Details:");
-        single.displayRoomDetails();
+        Scanner scanner = new Scanner(System.in);
+        ReservationValidator validator = new ReservationValidator();
 
-        System.out.println("Double Room Details:");
-        doubleRoom.displayRoomDetails();
+        try {
 
-        System.out.println("Suite Room Details:");
-        suite.displayRoomDetails();
+            System.out.print("Enter Guest Name: ");
+            String guestName = scanner.nextLine();
+
+            System.out.print("Enter Room Type (Single/Double/Suite): ");
+            String roomType = scanner.nextLine();
+
+            validator.validate(guestName, roomType);
+
+            System.out.println("Booking request accepted for " + guestName +
+                    " - " + roomType + " room.");
+
+        } catch (InvalidBookingException e) {
+
+            System.out.println("Booking failed: " + e.getMessage());
+
+        } finally {
+            scanner.close();
+        }
     }
 }
