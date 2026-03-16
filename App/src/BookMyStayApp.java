@@ -1,70 +1,58 @@
-abstract class Room {
+import java.util.*;
 
-    // Number of beds available in the room
-    protected int numberOfBeds;
+class CancellationService {
 
-    // Total size of the room in square feet
-    protected int squareFeet;
+    private Stack<String> releasedRoomIds;
+    private Map<String, String> reservationRoomTypeMap;
 
-    // Price charged per night
-    protected double pricePerNight;
-
-    // Constructor
-    public Room(int numberOfBeds, int squareFeet, double pricePerNight) {
-        this.numberOfBeds = numberOfBeds;
-        this.squareFeet = squareFeet;
-        this.pricePerNight = pricePerNight;
+    public CancellationService() {
+        releasedRoomIds = new Stack<>();
+        reservationRoomTypeMap = new HashMap<>();
     }
 
-    // Method to display room details
-    public void displayRoomDetails() {
-        System.out.println("Number of Beds: " + numberOfBeds);
-        System.out.println("Room Size (sq ft): " + squareFeet);
-        System.out.println("Price Per Night: ₹" + pricePerNight);
-        System.out.println("---------------------------");
+    public void registerBooking(String reservationId, String roomType) {
+        reservationRoomTypeMap.put(reservationId, roomType);
     }
-}
 
-// Single Room
-class SingleRoom extends Room {
+    public void cancelBooking(String reservationId) {
 
-    public SingleRoom() {
-        super(1, 250, 1500.0);
+        if (!reservationRoomTypeMap.containsKey(reservationId)) {
+            System.out.println("Reservation not found: " + reservationId);
+            return;
+        }
+
+        String roomType = reservationRoomTypeMap.remove(reservationId);
+        releasedRoomIds.push(reservationId);
+
+        System.out.println("Booking cancelled for Reservation ID: " + reservationId +
+                " | Room Type: " + roomType);
     }
-}
 
-// Double Room
-class DoubleRoom extends Room {
+    public void showRollbackHistory() {
 
-    public DoubleRoom() {
-        super(2, 400, 2500.0);
-    }
-}
+        System.out.println("Recently Cancelled Reservations:");
 
-// Suite Room
-class SuiteRoom extends Room {
+        Stack<String> temp = (Stack<String>) releasedRoomIds.clone();
 
-    public SuiteRoom() {
-        super(3, 750, 5000.0);
+        while (!temp.isEmpty()) {
+            System.out.println(temp.pop());
+        }
     }
 }
 
-// Main class
 public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        SingleRoom single = new SingleRoom();
-        DoubleRoom doubleRoom = new DoubleRoom();
-        SuiteRoom suite = new SuiteRoom();
+        CancellationService service = new CancellationService();
 
-        System.out.println("Single Room Details:");
-        single.displayRoomDetails();
+        service.registerBooking("R101", "Single");
+        service.registerBooking("R102", "Double");
+        service.registerBooking("R103", "Suite");
 
-        System.out.println("Double Room Details:");
-        doubleRoom.displayRoomDetails();
+        service.cancelBooking("R102");
+        service.cancelBooking("R101");
 
-        System.out.println("Suite Room Details:");
-        suite.displayRoomDetails();
+        service.showRollbackHistory();
     }
 }
